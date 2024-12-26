@@ -1,0 +1,440 @@
+data() 
+
+#to list the data sets in all available packages.
+data(package = .packages(all.available = TRUE))
+
+getwd()
+
+# To read this spreadsheet with R
+movie2023<- read.csv2("movie2023.csv", header = TRUE, fill = TRUE, stringsAsFactors = FALSE)
+
+View(movie2023)
+
+str(movie2023)
+
+colnames(movie2023)
+
+colnames(movie2023)[2] <- 'column name'
+colnames(movie2023)
+
+colnames(movie2023)[2] <- 'Name'
+colnames(movie2023)
+
+#The head() and tail() commands are used to display the first or last few rows
+head(movie2023)
+tail(movie2023)
+nrow(movie2023)
+ncol(movie2023)
+
+dim(movie2023)
+
+
+# to show rows with free of missing values
+complete.cases(movie2023)
+View(movie2023)
+
+# to show missing values
+
+any(is.na(movie2023))
+View(is.na(movie2023))
+
+is.na(movie2023)
+View(is.na(movie2023))
+
+# to obtain the dataset with free of missing values
+View(movie2023[complete.cases(movie2023),])
+
+# to obtain the dataset with missing values
+View(movie2023[!complete.cases(movie2023),])
+
+any(is.na(movie2023))
+View(is.na(movie2023))
+
+#is.na(movie2023$Name)
+#is.na(movie2023$IMDB.Score)
+
+sum(is.na(movie2023))
+colSums(is.na(movie2023))
+
+movie2023y <- na.omit(movie2023)
+View(movie2023y)
+
+table(movie2023$Release.Date)
+
+
+#***************** Descriptive Statistics
+summary(movie2023$Total.Revenue)
+
+
+# Missing values will block the override the result:
+
+mean(movie2023$OpeningWeekRevenue, na.rm = TRUE)
+median(movie2023$OpeningWeekRevenue, na.rm = TRUE)
+var(movie2023$Opening.Week.Revenue, na.rm = TRUE)
+sd(movie2023$Opening.Week.Revenue, na.rm = TRUE)
+unique(movie2023$Opening.Week.Audience)
+
+range(movie2023$Opening.Week.Revenue, na.rm = TRUE)
+IQR(movie2023$Opening.Week.Revenue, na.rm = TRUE)
+
+quantile(movie2023$TotalRevenue,prob=0.8, na.rm = TRUE )
+quantile(movie2023$TotalRevenue,prob=c(0.25,0.75), na.rm = TRUE)
+quantile(movie2023$TotalRevenue,prob=c(0,0.25,0.5,0.75,1), na.rm = TRUE)
+
+
+#*Subsesting Data / Data Manipulaton
+
+#to get 5th row only 
+movieRow<- movie2023y[5,]
+movieRow_1_5<- movie2023y[1:5,]
+View(movieRow_1_5)
+movieRow_2_4<- movie2023y[c(2,4),]
+View(movieRow_2_4)
+
+#to get 2nd, 3rd and 5th columns only 
+movieColumn_2_3_5<- movie2023y[,c(2,3,5)]
+View(movieColumn_2_3_5)
+
+#Sorting the data
+OrdRuntime <- order(movie2023$Runtime)
+View(movie2023 [OrdRuntime, ])
+
+View(movie2023 [order(movie2023$LocationCount), ])
+
+OrdReleaseWeek <- order(movie2023$Release.Weeks, decreasing ='true' )
+View(movie2023 [OrdReleaseWeek, ])
+
+#To get unique values
+unique(movie2023$IMDBScore)
+unique(movie2023$ReleaseDate)
+
+#KÜTÜPHANELER
+install.packages('ISLR')
+library(ISLR)
+View(movie2023)
+help(movie2023)
+
+# ************* Correlation analysis******************************************
+
+str(movie2023)
+# Sütun adlarını kontrol edin
+colnames(movie2023)
+
+# Simplify column names (optional)
+colnames(movie2023) <- c("ID", "Name", "OpeningWeekAudience", "TotalAudience",
+                         "OpeningWeekRevenue", "TotalRevenue", "IMDBScore",
+                         "ReleaseWeeks", "ReleaseDate", "Runtime", "LocationCount")
+
+
+# Clear and transform numeric columns
+movie2023$TotalRevenue <- as.numeric(gsub("\\.", "", movie2023$TotalRevenue))
+movie2023$TotalAudience <- as.numeric(gsub("\\.", "", movie2023$TotalAudience))
+movie2023$LocationCount <- as.numeric(movie2023$LocationCount) 
+
+#cor(TotalRevenue$TotalAudience, TotalRevenue$LocationCount, method = "pearson")
+#with(TotalRevenue, cor(TotalAudience, LocationCount , method = "pearson"))
+
+# Correlation between TotalRevenue and TotalAudience
+correlation_revenue_audience <- cor(movie2023$TotalRevenue, movie2023$TotalAudience, 
+                                    method = "pearson", use = "complete.obs")
+
+# Correlation between TotalRevenue and LocationCount
+correlation_revenue_location <- cor(movie2023$TotalRevenue, movie2023$LocationCount, 
+                                    method = "pearson", use = "complete.obs")
+# "complete.obs": Only considers observations that are not missing (NA) for either variable. Missing data is excluded from the calculation
+
+# Correlation between TotalAudience and LocationCount
+correlation_audience_location <- cor(movie2023$TotalAudience, movie2023$LocationCount, 
+                                     method = "pearson", use = "complete.obs")
+
+
+
+# Print correlation results
+#correlation_revenue_audience
+#correlation_revenue_location
+#correlation_audience_location
+
+#str(movie2023$TotalAudience)
+#str(movie2023$LocationCount)
+
+#movie2023$TotalAudience <- as.numeric(movie2023$TotalAudience)
+#movie2023$LocationCount <- as.numeric(movie2023$LocationCount)
+
+#sum(is.na(movie2023$TotalAudience))
+
+
+#print(correlation_audience_location)
+#print(correlation_audience_location)
+
+
+# Compute correlation matrix
+# We select numerical columns to calculate the correlation matrix
+corrmat_pearson <- cor(movie2023[, c("TotalRevenue", "OpeningWeekRevenue", "TotalAudience", "IMDBScore", "LocationCount")], 
+                       method = "pearson", use = "complete.obs")
+
+# View the correlation matrix
+View(corrmat_pearson)
+
+
+# Visualize correlation matrix
+install.packages("corrplot")
+library(corrplot)
+corrplot(corrmat_pearson, method="circle")
+corrplot(corrmat_pearson, method="color")
+corrplot(corrmat_pearson, method="number")
+
+corrplot(corrmat_pearson, type = "upper")
+corrplot(corrmat_pearson, type = "lower")
+
+
+corrplot(corrmat_pearson, type="upper", order="hclust", col=c("purple", "pink"),
+         bg="lightblue")
+
+
+
+corrplot(corrmat_pearson, method = "square", type = "upper", order = "hclust", 
+         tl.col = "purple", tl.srt = 45)
+
+# You can also create a mixed-type matrix using the following code.
+corrplot.mixed(corrmat_pearson,
+               upper = "square",
+               lower = "number",
+               addgrid.col = "black",
+               tl.col = "purple")
+
+
+# Install the required package for performance analysis (if you are using it for the first time)
+install.packages("PerformanceAnalytics")
+
+# Install the package
+library(PerformanceAnalytics)
+
+# We select certain columns to draw the correlation graph
+chart.Correlation(movie2023[, c("TotalRevenue", "OpeningWeekRevenue", "TotalAudience", "IMDBScore", "LocationCount")], 
+                  histogram=TRUE, pch=19)
+
+
+
+# split the values in the points column into bins of five equal sizes
+# Split IMDBScore column into 5 equally wide ranges
+movie2023$IMDBScore_bins <- cut(movie2023$IMDBScore, breaks = 5)
+# View the resulting ranges and the number of observations in each range
+table(movie2023$IMDBScore_bins)
+# Display binned column with dataset (optional)
+View(movie2023)
+
+# Split the openingweekrevenue column into specific ranges and calculate the number of values ​​in each range
+# Set maximum value
+max_value <- max(movie2023$OpeningWeekRevenue, na.rm = TRUE)
+
+# Cutting at dynamic ranges (in 100-unit increments)
+# Recreate the table
+table(cut(movie2023$OpeningWeekRevenue, seq(0, 54129290, 100)))
+
+
+#*************************   Scatterplot  **************************************
+# Scatter plot
+plot(movie2023$LocationCount, movie2023$TotalRevenue, 
+     main = "Konuma Bağlı Olarak Toplam Hasılat",  # Başlık
+     xlab = "Konum Sayısı (Location Count)",      # X ekseni açıklaması
+     ylab = "Toplam Hasılat (Total Revenue)",     # Y ekseni açıklaması
+     pch = 19,                                   # Nokta şekli
+     col = "blue")                               # Nokta rengi
+
+# E to close scientific notation (to eliminate e+'s)
+options(scipen = 999)
+
+# Scatter plot adapted correlation
+#with(movie2023, plot(TotalAudience, TotalRevenue, 
+# col = "violet",  # Nokta rengi
+#pch = 10,        # Nokta şekli
+#main = "Total Revenue by Number of Locations",  
+#xlab = "İzleyici sayısı (TotalAudience)",    
+#ylab = "Toplam Hasılat (Total Revenue)"))   
+
+# To turn off scientific notation
+#options(scipen = 999)
+
+# Histogram: Opening Week Revenue
+hist(movie2023$IMDBScore,
+     main = "IMDB  Dağılımı",  # Başlık
+     ylab = "Frekans",                          # Y ekseni açıklaması
+     xlab = "IMDB",          # X ekseni açıklaması
+     col = "red",                              # Bar rengi
+     border = "black")                          # Bar kenarlık rengi
+
+# To turn off scientific notation
+options(scipen = 999)
+
+#*************************   Box Plots  **************************************
+# Boxplot between OpeningWeekAudience and OpeningWeekRevenue
+
+movie2023$RuntimeCategory <- cut(movie2023$Runtime, 
+                                 breaks = c(0, 90, 120, 150, Inf), 
+                                 labels = c("Short (<90 min)", "Standard (90-120 min)", "Long (120-150 min)", "Ekstra (>150 min)"))
+
+# IMDB boxplot by runtime
+boxplot(movie2023$IMDBScore ~ movie2023$RuntimeCategory, 
+        main = "Film Suresine Gore IMDB Puanı",
+        xlab = "Film Suresi Kategorisi",
+        ylab = "IMDB Puanı",
+        col = "lightgreen",
+        border = "darkgreen")
+
+
+# Bar chart for categorical variable
+barplot(table(movie2023$ReleaseDate),
+        main = "Movie Release Dates Distribution",
+        xlab = "Release Dates",
+        ylab = "Frequency",
+        col = "lightblue",
+        border = "black")
+
+# Pie chart for categorical variable
+release_date_counts <- table(movie2023$ReleaseDate)
+pie(release_date_counts,
+    main = "Aylara gore vizyondaki film sayıları",
+    col = rainbow(length(release_date_counts)),
+    labels = paste(names(release_date_counts), "\n", release_date_counts))
+
+
+#CLUSTERS
+# Installing the required libraries
+install.packages("NbClust")
+install.packages("factoextra")
+install.packages("dendextend")
+
+library(dendextend)
+library(NbClust)
+library(factoextra)
+library(ggplot2)
+
+# Data cleaning and organization
+movie2023_perf <- na.omit(movie2023)  # Eksik verileri kaldır
+movie2023_perf <- movie2023_perf[ -c(1,2,9)]  # İstenmeyen sütunları çıkar
+
+# Select and scale numeric columns
+movie2023_perf <- movie2023_perf[, sapply(movie2023_perf, is.numeric)]
+movie2023_scaled <- scale(movie2023_perf)  # Veriyi ölçeklendir
+View(movie2023_scaled)
+
+# *Determining the Number of Clusters with the Elbow Method*
+fviz_nbclust(movie2023_scaled, kmeans, method = "wss", k.max = 12) +
+  geom_vline(xintercept = 4, linetype = 2)  
+
+# K-means clustering
+set.seed(2345)
+movie_cluster <- kmeans(movie2023_scaled, centers = 4, nstart = 20)
+
+# View cluster sizes
+movie_cluster$size
+
+# We add the cluster results to the dataset
+movie2023_perf$cluster <- movie_cluster$cluster
+
+# Summarize cluster memberships with a table
+table(movie2023_perf$cluster)
+
+# Visualize results
+fviz_cluster(movie_cluster, data = movie2023_scaled, 
+             geom = "point", ellipse.type = "convex", 
+             ggtheme = theme_minimal(), main = "K-means Clustering")
+
+
+# Required libraries
+install.packages("ggplot2")
+install.packages("dplyr")
+library(ggplot2)
+library(dplyr)
+
+# Assumption: "movie2023_scaled" and "movie2023_perf" were created and cleaned before.
+
+# 1. Distance Matrix Calculation
+set.seed(1234)
+dist_matrix <- dist(movie2023_scaled, method = "euclidean")
+
+# 2. Hierarchical Clustering (Ward's Method)
+movie_hclust <- hclust(dist_matrix, method = "ward.D")
+plot(movie_hclust, labels = FALSE, hang = -1, main = "Dendrogram of Movies (Ward's Method)")
+
+# Show cluster boundaries on dendrogram
+rect.hclust(movie_hclust, k = 4, border = 2:5)
+
+# 3. Küme Üyeliklerini Belirleme
+movie2023_perf$cluster_hierarchical <- cutree(movie_hclust, k = 4)
+table(movie2023_perf$cluster_hierarchical)
+
+# 4. Analysis of Results
+# Generate summary statistics by cluster
+movie_cluster_statistics <- aggregate(
+  movie2023_perf[, -ncol(movie2023_perf)],  # Son sütunu hariç tut (küme sütunu)
+  by = list(cluster = movie2023_perf$cluster_hierarchical), 
+  mean
+)
+
+# Adding the number of observations in each cluster
+movie_cluster_statistics$N <- as.numeric(table(movie2023_perf$cluster_hierarchical))
+View(movie_cluster_statistics)
+
+# 5. Visualization of Results
+# Küme sonuçlarını entegre ettik
+movie_clusters <- data.frame(movie2023_perf)
+
+
+ggplot(movie_clusters, aes(x = ReleaseWeeks, y = OpeningWeekRevenue, color = factor(cluster_hierarchical))) +
+  geom_point(size = 2) +
+  labs(title = "Hierarchical Clustering: Release Weeks vs Opening Week Revenue",
+       x = "Release Weeks",
+       y = "Opening Week Revenue",
+       color = "Cluster") +
+  theme_minimal()
+
+#ggplot(movie_clusters, aes(x = ReleaseWeeks, y = IMDBScore, color = factor(cluster_hierarchical))) +
+#geom_point() +
+#labs(title = "Hierarchical Clustering: IMDB Score vs Release Weeks",
+#x = "Release Weeks",
+#y = "IMDb Score",
+#color = "Cluster")
+
+
+ggplot(movie_clusters, aes(x = TotalAudience, y = Runtime, color = factor(cluster_hierarchical))) +
+  geom_point(size = 2) +
+  labs(title = "Hierarchical Clustering: Total Audience vs Runtime",
+       x = "Total Audience",
+       y = "Runtime (minutes)",
+       color = "Cluster") +
+  theme_minimal()
+
+
+#ggplot(movie_clusters, aes(x = OpeningWeekRevenue, y = TotalRevenue, color = factor(cluster_hierarchical))) +
+#geom_point(size = 2) +
+#labs(title = "Hierarchical Clustering: Opening Week Revenue vs Total Revenue",
+# x = "Opening Week Revenue",
+#y = "Total Revenue",
+#color = "Cluster") +
+#theme_minimal()
+
+
+
+# Example visualization: Total Audience vs Location Count
+ggplot(movie_clusters, aes(x = TotalAudience, y = LocationCount, color = factor(cluster_hierarchical))) +
+  geom_point() +
+  labs(title = "Hierarchical Clustering: Total Audience vs Location Count",
+       x = "Total Audience",
+       y = "Location Count",
+       color = "Cluster")
+
+
+# *********Sonuçların Görselleştirilmesi************
+
+# Required library
+library(ggplot2)
+
+
+# *********Sonuçların Dışa Aktarılması************
+
+# Save cluster results as CSV
+write.csv(movie_clusters, "movie_clusters.csv", row.names = FALSE)
+
+# Save cluster summaries as CSV
+write.csv(movie_cluster_statistics, "movie_cluster_statistics.csv", row.names = FALSE)
